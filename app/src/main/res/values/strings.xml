@@ -1,4 +1,12 @@
 <resources>
-    <string name="app_name">tickets_2</string>
+    <string name="app_name">Tickets</string>
     <string name="notification_activity" />
+    <string name="searchItemTitle">Поиск</string>
+    <string name="notificationItemTitle">Уведомление</string>
+    <string name="filterItemTitle">Фильтр</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="editEventDatePlaceholder">Введите дату поиска мероприятий</string>
+    <string name="fromBynTitle">От, BYN</string>
+    <string name="toBynTitle">До, BYN</string>
 </resources>

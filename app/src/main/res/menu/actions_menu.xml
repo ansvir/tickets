@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/filterItem"
+        android:icon="@drawable/filter_solid"
+        android:title="@string/filterItemTitle" />
+    <item
+        android:id="@+id/notificationItem"
+        android:icon="@drawable/bell_solid"
+        android:title="@string/notificationItemTitle" />
+    <item
+        android:id="@+id/searchItem"
+        android:icon="@drawable/search_solid"
+        android:title="@string/searchItemTitle" />
+</menu>
