@@ -1,9 +1,7 @@
 package com.example.tickets_2.fragment
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.AttributeSet
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,11 +13,15 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.example.tickets_2.R
 import com.example.tickets_2.api.kvitki.KvitkiRestClient
+import com.example.tickets_2.api.model.FilterDto
 import com.example.tickets_2.models.api.KvitkiApiResponse
 import com.example.tickets_2.models.api.KvitkiEventApiResponse
 import com.example.tickets_2.service.NotificationService
 import com.example.tickets_2.util.CommonUtil
 import dagger.hilt.android.AndroidEntryPoint
+import java.math.BigDecimal
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -31,7 +33,6 @@ import javax.inject.Inject
 class SearchFragment : Fragment() {
 
     private val defaultCellPad: Int = 8
-    private val cellsPerRow: Int = 3
 
     private lateinit var view: View
 
@@ -64,16 +65,14 @@ class SearchFragment : Fragment() {
     }
 
     // заполняет таблицу для SearchFragment
-    private fun populateGrid(layout: TableLayout, events: KvitkiApiResponse) {
-        for (rowIndex in 0 until events.responseData.event.size step cellsPerRow) {
+    private fun populateGrid(layout: TableLayout, events: KvitkiApiResponse, filter: FilterDto) {
+        val eventsFiltered = filterEvents(events, filter)
+        for (nextEvent in eventsFiltered) {
             val tableRow = TableRow(layout.context)
-            for (cellIndex in rowIndex until (rowIndex + cellsPerRow).coerceAtMost(events.responseData.event.size)) {
-                val nextEvent = events.responseData.event[cellIndex]
-                val textView = TextView(tableRow.context)
-                textView.text = buildTitle(nextEvent)
-                textView.setPadding(defaultCellPad, defaultCellPad, defaultCellPad, defaultCellPad)
-                tableRow.addView(textView)
-            }
+            val textView = TextView(tableRow.context)
+            textView.text = buildTitle(nextEvent)
+            textView.setPadding(defaultCellPad, defaultCellPad, defaultCellPad, defaultCellPad)
+            tableRow.addView(textView)
             layout.addView(tableRow)
         }
     }
@@ -98,7 +97,7 @@ class SearchFragment : Fragment() {
             kvitkiRestClient.getConcertsListInfo(FilterFragment.filter) { response ->
                 if (response != null) {
                     // заполняем таблицу
-                    populateGrid(eventsList, response)
+                    populateGrid(eventsList, response, FilterFragment.filter)
                 } else {
                     Log.w(KvitkiRestClient.KVITKI_RESPONSE_TAG, "server returned null response")
                     notificationService.showNotification("Возникла ошибка получения мероприятий!")
@@ -109,6 +108,65 @@ class SearchFragment : Fragment() {
             Log.d(CommonUtil.DEBUG_TAG, "Price in filter to is more than price from!")
         }
 
+    }
+
+    // отфильтровывает мероприятия в соответствии с фильтром
+    private fun filterEvents(response: KvitkiApiResponse, filter: FilterDto): List<KvitkiEventApiResponse> {
+        return response.responseData.event.filter {
+            val priceRange = it.prices
+            if (priceRange.isNotEmpty()) {
+                if (priceRange.contains(" - ")) {
+                    val minMaxPrices = priceRange.trim().split(" - ")
+                    BigDecimal(minMaxPrices.component1()) >= filter.fromPrice
+                            && BigDecimal(minMaxPrices.component2()) <= filter.toPrice
+                } else {
+                    val price = priceRange.trim()
+                    BigDecimal(price) >= filter.fromPrice && BigDecimal(price) <= filter.toPrice
+                }
+            } else {
+                false
+            }
+        }.filter {
+            val from = CommonUtil.stringDateToDate(it.localisedStartDate.split(" ").component2())
+            val to = CommonUtil.stringDateToDate(it.localisedEndDate.split(" ").component2())
+            if (from != null && to != null) {
+                isDateInRange(filter.date, from, to)
+            } else {
+                false
+            }
+        }
+
+    }
+
+    private fun isDateInRange(filterDate: Date, fromDate: Date, toDate: Date): Boolean {
+        val calendarFilter = Calendar.getInstance()
+        calendarFilter.time = filterDate
+
+        val calendarFrom = Calendar.getInstance()
+        calendarFrom.time = fromDate
+
+        val calendarTo = Calendar.getInstance()
+        calendarTo.time = toDate
+
+        if (calendarFilter.get(Calendar.YEAR) < calendarFrom.get(Calendar.YEAR) ||
+            calendarFilter.get(Calendar.YEAR) > calendarTo.get(Calendar.YEAR)
+        ) {
+            return false
+        }
+
+        if (calendarFilter.get(Calendar.YEAR) == calendarFrom.get(Calendar.YEAR) &&
+            calendarFilter.get(Calendar.DAY_OF_YEAR) < calendarFrom.get(Calendar.DAY_OF_YEAR)
+        ) {
+            return false
+        }
+
+        if (calendarFilter.get(Calendar.YEAR) == calendarTo.get(Calendar.YEAR) &&
+            calendarFilter.get(Calendar.DAY_OF_YEAR) > calendarTo.get(Calendar.DAY_OF_YEAR)
+        ) {
+            return false
+        }
+
+        return true
     }
 
 }

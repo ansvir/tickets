@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/searchGrid"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/gridScroll"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".fragment.SearchFragment" />
+    android:layout_height="match_parent">
+
+    <TableLayout xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/searchGrid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".fragment.SearchFragment" />
+</ScrollView>

@@ -1,12 +1,17 @@
 package com.example.tickets_2.util
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 /**
  * Класс-ютилити содержащий общие методы
@@ -16,6 +21,7 @@ class CommonUtil {
     companion object {
 
         const val DEBUG_TAG: String = "DEBUG_TAG"
+        const val DEFAULT_DATE_FORMAT = "dd.MM.yyyy"
 
         /**
          * Получает текущую дату в формате String
@@ -46,13 +52,26 @@ class CommonUtil {
         }
 
         /**
-         * Получает дату в формате "dd.MM.yyyy"
+         * Получает дату в формате строки "dd.MM.yyyy" из даты
          */
         @RequiresApi(Build.VERSION_CODES.O)
         fun dateToString(date: Date): String {
             val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-            val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+            val formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)
             return formatter.format(localDate)
+        }
+
+        /**
+         * Получает дату в формате "dd.MM.yyyy" из строки, иначе null
+         */
+        fun stringDateToDate(dateString: String): Date? {
+            val format = SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.forLanguageTag("ru"))
+            return try {
+                format.parse(dateString)
+            } catch (e: ParseException) {
+                Log.d(DEBUG_TAG, "cannot parse string date to date: $dateString")
+                null
+            }
         }
 
     }

@@ -1,31 +1,27 @@
 package com.example.tickets_2.fragment
 
 import android.animation.ObjectAnimator
-import android.content.Context
 import android.os.Bundle
-import android.text.method.KeyListener
-import android.util.AttributeSet
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.CalendarView
 import android.widget.EditText
 import android.widget.Spinner
 import com.example.tickets_2.R
-import com.example.tickets_2.api.kvitki.KvitkiRestClient
+import com.example.tickets_2.TicketsApplication
 import com.example.tickets_2.api.model.FilterDto
 import com.example.tickets_2.models.api.KvitkiEventType
-import com.example.tickets_2.service.NotificationService
-import com.example.tickets_2.util.CommonUtil
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.scopes.FragmentScoped
 import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
-import javax.inject.Inject
 
 /**
  * A simple [Fragment] subclass.
@@ -52,14 +48,27 @@ class FilterFragment : Fragment() {
             cal.set(year, month, dayOfMonth)
             filter.date = cal.time
         }
-        fromPrice.setOnKeyListener { view, keyCode, keyEvent ->
-            filter.fromPrice = BigDecimal(fromPrice.text.toString())
-            true
-        }
-        toPrice.setOnKeyListener { view, keyCode, keyEvent ->
-            filter.toPrice = BigDecimal(toPrice.text.toString())
-            true
-        }
+        fromPrice.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val fromPriceString = fromPrice.text.toString()
+                try {
+                    filter.fromPrice = BigDecimal(fromPriceString)
+                } catch (ignored: NumberFormatException) {}
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+        toPrice.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val toPriceString = toPrice.text.toString()
+                try {
+                    filter.toPrice = BigDecimal(toPriceString)
+                } catch (ignored: NumberFormatException) {}
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+        populateEventTypesView(eventType)
         eventType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedItem = parent.getItemAtPosition(position) as String
@@ -97,6 +106,14 @@ class FilterFragment : Fragment() {
         scaleY.repeatMode = ObjectAnimator.REVERSE
         scaleX.start()
         scaleY.start()
+    }
+
+    private fun populateEventTypesView(eventType: Spinner) {
+        val items = KvitkiEventType.entries.map {
+            it.value
+        }
+        val adapter = ArrayAdapter(TicketsApplication.instance, android.R.layout.simple_spinner_item, items)
+        eventType.adapter = adapter
     }
 
 }
