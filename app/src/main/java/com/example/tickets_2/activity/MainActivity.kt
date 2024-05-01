@@ -7,6 +7,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.AdapterView
@@ -20,10 +21,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import com.example.tickets_2.R
 import com.example.tickets_2.api.kvitki.KvitkiRestClient
+import com.example.tickets_2.fragment.FilterFragment
+import com.example.tickets_2.fragment.NotificationFragment
+import com.example.tickets_2.fragment.SearchFragment
 import com.example.tickets_2.models.api.KvitkiApiResponse
 import com.example.tickets_2.models.api.KvitkiEventApiResponse
 import com.example.tickets_2.service.NotificationService
 import com.example.tickets_2.util.CommonUtil
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,7 +50,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        findViewById<BottomNavigationView>(R.id.actionsMenu)
+            .setOnItemSelectedListener { getOnItemSelectedHandler(it) }
 //        Timer().scheduleAtFixedRate(object : TimerTask() {
 //            override fun run() {
 //                kvitkiRestClient.getConcertsListInfo()
@@ -53,6 +59,37 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }, 0, 30 * 60 * 1000) // 30 минут в миллисекундах
 
+    }
+
+    // получает обработчик выбора элемента меню
+    private fun getOnItemSelectedHandler(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.filterItem -> {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.mainFragment, FilterFragment.newInstance())
+                    addToBackStack(null)
+                    commit()
+                }
+                true
+            }
+            R.id.notificationItem -> {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.mainFragment, NotificationFragment.newInstance())
+                    addToBackStack(null)
+                    commit()
+                }
+                true
+            }
+            R.id.searchItem -> {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.mainFragment, SearchFragment.newInstance())
+                    addToBackStack(null)
+                    commit()
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun getNewDate(events: List<KvitkiEventApiResponse>): String {

@@ -4,6 +4,6 @@ package com.example.tickets_2.models.api
  * Сущность-содержание ответа от API kvitki.by
  */
 data class KvitkiApiResponseContent(
-    val events: List<KvitkiEventApiResponse>,
+    val event: List<KvitkiEventApiResponse>,
     val listInfo: KvitkiTotalApiResponse,
 )

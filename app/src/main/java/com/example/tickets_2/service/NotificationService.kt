@@ -2,13 +2,18 @@ package com.example.tickets_2.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.Service
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.tickets_2.R
 import com.example.tickets_2.TicketsApplication
+import dagger.hilt.android.AndroidEntryPoint
 
-class NotificationService {
+@AndroidEntryPoint
+class NotificationService: Service() {
 
     fun showNotification(message: String) {
         val notificationManager = TicketsApplication.instance.getSystemService(Context.NOTIFICATION_SERVICE)
@@ -38,5 +43,9 @@ class NotificationService {
 
         val notification = notificationBuilder.build()
         notificationManager.notify(0, notification)
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        TODO("Not yet implemented")
     }
 }

@@ -20,6 +20,8 @@ import com.example.tickets_2.api.model.FilterDto
 import com.example.tickets_2.models.api.KvitkiEventType
 import com.example.tickets_2.service.NotificationService
 import com.example.tickets_2.util.CommonUtil
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.scopes.FragmentScoped
 import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
@@ -30,9 +32,8 @@ import javax.inject.Inject
  * Use the [FilterFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
+@AndroidEntryPoint
 class FilterFragment : Fragment() {
-
-    lateinit var filter: FilterDto
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,6 +79,9 @@ class FilterFragment : Fragment() {
          */
         @JvmStatic
         fun newInstance() = FilterFragment()
+
+        lateinit var filter: FilterDto
+
     }
 
     private fun zoomView(view: View) {

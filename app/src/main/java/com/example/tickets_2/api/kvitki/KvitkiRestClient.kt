@@ -1,12 +1,16 @@
 package com.example.tickets_2.api.kvitki
 
+import android.app.Service
+import android.content.Intent
 import android.os.Build
+import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.tickets_2.api.model.FilterDto
 import com.example.tickets_2.models.api.KvitkiApiResponse
 import com.example.tickets_2.util.CommonUtil
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -15,11 +19,13 @@ import okhttp3.Request
 import okhttp3.Response
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
+import javax.inject.Inject
 
 /**
  * REST-клиент для API kvitki.by
  */
-class KvitkiRestClient {
+@AndroidEntryPoint
+class KvitkiRestClient: Service() {
 
     companion object {
         var KVITKI_URL = "https://www.kvitki.by/ajaxCaller/"
@@ -34,7 +40,7 @@ class KvitkiRestClient {
         // Создаем клиент OkHttp
         val client = OkHttpClient()
 
-        val eventId = filter.eventType.id
+        val eventId = filter.eventType.eventId
         val date = CommonUtil.dateToString(filter.date)
 
         // Создаем запрос
@@ -82,6 +88,10 @@ class KvitkiRestClient {
             }
         }
         return null
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        TODO("Not yet implemented")
     }
 
 }

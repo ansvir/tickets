@@ -15,11 +15,11 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.example.tickets_2.R
 import com.example.tickets_2.api.kvitki.KvitkiRestClient
-import com.example.tickets_2.api.model.FilterDto
 import com.example.tickets_2.models.api.KvitkiApiResponse
 import com.example.tickets_2.models.api.KvitkiEventApiResponse
 import com.example.tickets_2.service.NotificationService
 import com.example.tickets_2.util.CommonUtil
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 /**
@@ -27,6 +27,7 @@ import javax.inject.Inject
  * Use the [SearchFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
+@AndroidEntryPoint
 class SearchFragment : Fragment() {
 
     private val defaultCellPad: Int = 8
@@ -51,12 +52,6 @@ class SearchFragment : Fragment() {
         return view
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun onInflate(context: Context, attrs: AttributeSet, savedInstanceState: Bundle?) {
-        super.onInflate(context, attrs, savedInstanceState)
-        runSearch()
-    }
-
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -70,10 +65,10 @@ class SearchFragment : Fragment() {
 
     // заполняет таблицу для SearchFragment
     private fun populateGrid(layout: TableLayout, events: KvitkiApiResponse) {
-        for (rowIndex in 0 until events.responseData.events.size step cellsPerRow) {
+        for (rowIndex in 0 until events.responseData.event.size step cellsPerRow) {
             val tableRow = TableRow(layout.context)
-            for (cellIndex in rowIndex until (rowIndex + cellsPerRow).coerceAtMost(events.responseData.events.size)) {
-                val nextEvent = events.responseData.events[cellIndex]
+            for (cellIndex in rowIndex until (rowIndex + cellsPerRow).coerceAtMost(events.responseData.event.size)) {
+                val nextEvent = events.responseData.event[cellIndex]
                 val textView = TextView(tableRow.context)
                 textView.text = buildTitle(nextEvent)
                 textView.setPadding(defaultCellPad, defaultCellPad, defaultCellPad, defaultCellPad)
@@ -92,16 +87,15 @@ class SearchFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun runSearch() {
         val eventsList = view.findViewById<TableLayout>(R.id.searchGrid)
-        val filterFragment = FilterFragment.newInstance()
 
         // получаем значения от и до цен из фильтра
-        val fromPrice = filterFragment.filter.fromPrice
-        val toPrice = filterFragment.filter.toPrice
+        val fromPrice = FilterFragment.filter.fromPrice
+        val toPrice = FilterFragment.filter.toPrice
 
         // сравниваем цены и заполняем таблицу, либо показываем уведомление о заполнении фильтра правильно и выводим лог
         if (fromPrice <= toPrice) {
             // делаем запрос на API
-            kvitkiRestClient.getConcertsListInfo(filterFragment.filter) { response ->
+            kvitkiRestClient.getConcertsListInfo(FilterFragment.filter) { response ->
                 if (response != null) {
                     // заполняем таблицу
                     populateGrid(eventsList, response)

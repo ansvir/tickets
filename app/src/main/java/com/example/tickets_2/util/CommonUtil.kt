@@ -2,6 +2,7 @@ package com.example.tickets_2.util
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.util.Calendar
@@ -49,8 +50,9 @@ class CommonUtil {
          */
         @RequiresApi(Build.VERSION_CODES.O)
         fun dateToString(date: Date): String {
+            val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
             val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-            return formatter.format(date.toInstant())
+            return formatter.format(localDate)
         }
 
     }
