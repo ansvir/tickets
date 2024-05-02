@@ -31,6 +31,12 @@ class NotificationSharedPreferences: Service() {
             NotificationDto::class.java) }.values.toMutableList()
     }
 
+    fun deleteById(id: Long) {
+        val editor = NOTIFICATION_PREFERENCES.edit()
+        editor.remove(id.toString())
+        editor.apply()
+    }
+
     override fun onBind(intent: Intent?): IBinder? {
         TODO("Not yet implemented")
     }

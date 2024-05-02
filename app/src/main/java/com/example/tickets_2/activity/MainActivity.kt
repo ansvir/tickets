@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity() {
                             if (response != null) {
                                 if (response.responseData.event.isNotEmpty()) {
                                     notificationService.sendNotification(it)
+                                    notificationSharedPreferences.deleteById(it.id)
                                 }
                             }
                         }
