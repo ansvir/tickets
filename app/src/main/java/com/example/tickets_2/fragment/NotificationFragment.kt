@@ -2,7 +2,6 @@ package com.example.tickets_2.fragment
 
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +9,7 @@ import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
 import com.example.tickets_2.R
 import com.example.tickets_2.models.common.NotificationDto
 import com.example.tickets_2.storage.NotificationSharedPreferences
