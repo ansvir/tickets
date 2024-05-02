@@ -43,7 +43,8 @@ class NotificationFragment : Fragment() {
         populateGrid(allNotifications, notificationSharedPreferences.findAllNotifications())
         val addNotification = view.findViewById<FloatingActionButton>(R.id.addNotification)
         addNotification.setOnClickListener {
-            var nextId = notificationSharedPreferences.findAllNotifications().lastOrNull()?.id
+            var nextId = notificationSharedPreferences.findAllNotifications()
+                .maxByOrNull { it.id }?.id
             if (nextId == null) {
                 nextId = 1L
             } else {
@@ -58,7 +59,7 @@ class NotificationFragment : Fragment() {
     // заполняет таблицу NotificationFragment уведомлениями
     @RequiresApi(Build.VERSION_CODES.O)
     private fun populateGrid(layout: TableLayout, notifications: List<NotificationDto>) {
-        for (nextNotification in notifications) {
+        for (nextNotification in notifications.sortedBy { it.id }) {
             val tableRow = TableRow(layout.context)
             val textView = TextView(tableRow.context)
             textView.text = buildTitle(nextNotification)

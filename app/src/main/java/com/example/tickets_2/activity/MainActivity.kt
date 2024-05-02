@@ -44,9 +44,12 @@ class MainActivity : AppCompatActivity() {
                     .forEach {
                         kvitkiRestClient.getConcertsListInfo(it.filter) { response ->
                             if (response != null) {
-                                if (response.responseData.event.isNotEmpty()) {
-                                    notificationService.sendNotification(it)
-                                    notificationSharedPreferences.deleteById(it.id)
+                                if (response.responseData.event != null) {
+                                    if (response.responseData.event!!.isNotEmpty()) {
+                                        notificationService.sendNotification(it)
+                                        // добавить когда будут работать уведомления
+                                        // notificationSharedPreferences.deleteById(it.id)
+                                    }
                                 }
                             }
                         }

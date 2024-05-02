@@ -111,7 +111,7 @@ class SearchFragment : Fragment() {
 
     // отфильтровывает мероприятия в соответствии с фильтром
     private fun filterEvents(response: KvitkiApiResponse, filter: FilterDto): List<KvitkiEventApiResponse> {
-        return response.responseData.event.filter {
+        return response.responseData.event?.filter {
             val priceRange = it.prices
             if (priceRange.isNotEmpty()) {
                 if (priceRange.contains(" - ")) {
@@ -125,7 +125,7 @@ class SearchFragment : Fragment() {
             } else {
                 false
             }
-        }.filter {
+        }!!.filter {
             val from = CommonUtil.stringDateToDate(it.localisedStartDate.split(" ").component2())
             val to = CommonUtil.stringDateToDate(it.localisedEndDate.split(" ").component2())
             if (from != null && to != null) {
