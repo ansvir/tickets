@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+
     @Provides
     fun kvitkiRestClient(): KvitkiRestClient {
         return KvitkiRestClient()

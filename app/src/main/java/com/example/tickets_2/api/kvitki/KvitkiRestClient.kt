@@ -17,9 +17,6 @@ import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import java.util.Queue
-import java.util.concurrent.ConcurrentLinkedQueue
-import javax.inject.Inject
 
 /**
  * REST-клиент для API kvitki.by
@@ -69,6 +66,7 @@ class KvitkiRestClient: Service() {
         }
 
     }
+
     private fun parseConcertListInfo(response: Response): KvitkiApiResponse? {
         // Проверяем, успешен ли запрос
         if (response.isSuccessful) {
