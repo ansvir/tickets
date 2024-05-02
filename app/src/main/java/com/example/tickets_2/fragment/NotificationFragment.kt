@@ -52,6 +52,8 @@ class NotificationFragment : Fragment() {
             }
             val newNotification = NotificationDto.create(nextId, defaultNotificationTitle, FilterFragment.filter)
             notificationSharedPreferences.storeNotification(newNotification)
+            allNotifications.removeAllViews()
+            populateGrid(allNotifications, notificationSharedPreferences.findAllNotifications())
         }
         return view
     }
