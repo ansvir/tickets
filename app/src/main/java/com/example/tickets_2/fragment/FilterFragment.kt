@@ -16,7 +16,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import com.example.tickets_2.R
 import com.example.tickets_2.TicketsApplication
-import com.example.tickets_2.api.model.FilterDto
+import com.example.tickets_2.models.common.FilterDto
 import com.example.tickets_2.models.api.KvitkiEventType
 import dagger.hilt.android.AndroidEntryPoint
 import java.math.BigDecimal
@@ -41,8 +41,8 @@ class FilterFragment : Fragment() {
         val fromPrice = view.findViewById<EditText>(R.id.fromByn)
         val toPrice = view.findViewById<EditText>(R.id.toByn)
         val eventType = view.findViewById<Spinner>(R.id.eventTypeSpinner)
-        filter = FilterDto(Date(calendar.date), BigDecimal(0.0), BigDecimal(10_000),
-            KvitkiEventType.THEATER)
+        filter = FilterDto.createDefault()
+        filter.date = Date(calendar.date)
         calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
             val cal = Calendar.getInstance()
             cal.set(year, month, dayOfMonth)

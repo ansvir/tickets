@@ -6,7 +6,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.example.tickets_2.api.model.FilterDto
+import com.example.tickets_2.models.common.FilterDto
 import com.example.tickets_2.models.api.KvitkiApiResponse
 import com.example.tickets_2.util.CommonUtil
 import com.google.gson.Gson

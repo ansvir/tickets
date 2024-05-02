@@ -8,44 +8,46 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import com.example.tickets_2.R
 import com.example.tickets_2.TicketsApplication
+import com.example.tickets_2.models.common.NotificationDto
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Сервис для отправки уведомлений пользователю
+ */
 @AndroidEntryPoint
 class NotificationService: Service() {
 
-    fun showNotification(message: String) {
-        val notificationManager = TicketsApplication.instance.getSystemService(Context.NOTIFICATION_SERVICE)
-                as NotificationManager
-        val channelId = "default_channel_id"
+    companion object {
+        const val DEFAULT_CHANNEL_ID = "default_channel_id"
+        const val DEFAULT_CHANNEL_NAME = "Агрегатор билетов | Уведомление"
+    }
 
+    fun sendNotification(notification: NotificationDto) {
+        val notificationManager =
+            TicketsApplication.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // создаём канал уведомлений для андроида версии больше O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Создаем канал уведомлений (требуется для API 26+)
-            val channelName = "Default Channel"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val notificationChannel = NotificationChannel(channelId, channelName, importance)
-            notificationManager.createNotificationChannel(notificationChannel)
+            val channel = NotificationChannel(DEFAULT_CHANNEL_ID, DEFAULT_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT)
+            notificationManager.createNotificationChannel(channel)
         }
-//        // Создаем интент для запуска вашей активити
-//        val intent = Intent(this, MainActivity::class.java)
-//        // Устанавливаем флаги для интента, чтобы он запускал вашу активити, даже если приложение находится в фоновом режиме
-//        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-//        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-
-        val notificationBuilder = NotificationCompat.Builder(TicketsApplication.instance, channelId)
-            .setContentTitle("Уведомление")
-            .setContentText(message)
-            .setSmallIcon(R.drawable.baseline_add_alert_24) //  иконкa уведомления
+        // создаём само уведомление
+        val builder = NotificationCompat.Builder(TicketsApplication.instance, DEFAULT_CHANNEL_ID)
+            .setSmallIcon(androidx.core.R.drawable.notification_icon_background)
+            .setContentTitle(DEFAULT_CHANNEL_NAME)
+            .setContentText(notification.message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
-        //.setContentIntent(pendingIntent) // Устанавливаем интент для запуска активити по нажатию на уведомление
 
-        val notification = notificationBuilder.build()
-        notificationManager.notify(0, notification)
+        // показываем уведомление
+        notificationManager.notify(notification.id.toInt(), builder.build())
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         TODO("Not yet implemented")
     }
+
 }

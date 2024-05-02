@@ -2,6 +2,7 @@ package com.example.tickets_2.module
 
 import com.example.tickets_2.api.kvitki.KvitkiRestClient
 import com.example.tickets_2.service.NotificationService
+import com.example.tickets_2.storage.NotificationSharedPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,6 +20,11 @@ class AppModule {
     @Provides
     fun notificationService(): NotificationService {
         return NotificationService()
+    }
+
+    @Provides
+    fun notificationSharedPreferences(): NotificationSharedPreferences {
+        return NotificationSharedPreferences()
     }
 
 }

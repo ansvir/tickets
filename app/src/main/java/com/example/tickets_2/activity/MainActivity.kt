@@ -17,6 +17,7 @@ import android.widget.DatePicker
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import com.example.tickets_2.R
@@ -26,7 +27,11 @@ import com.example.tickets_2.fragment.NotificationFragment
 import com.example.tickets_2.fragment.SearchFragment
 import com.example.tickets_2.models.api.KvitkiApiResponse
 import com.example.tickets_2.models.api.KvitkiEventApiResponse
+import com.example.tickets_2.models.api.KvitkiEventType
+import com.example.tickets_2.models.common.FilterDto
+import com.example.tickets_2.models.common.NotificationDto
 import com.example.tickets_2.service.NotificationService
+import com.example.tickets_2.storage.NotificationSharedPreferences
 import com.example.tickets_2.util.CommonUtil
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.Gson
@@ -39,6 +44,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.util.Calendar
+import java.util.Date
 import java.util.Timer
 import java.util.TimerTask
 import javax.inject.Inject
@@ -46,18 +52,37 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private var currentDate = CommonUtil.currentDateToString()
+    private val defaultNotificationInterval = 30 * 60 * 1000L // 30 минут в миллисекундах
+
+    @Inject
+    lateinit var notificationService: NotificationService
+
+    @Inject
+    lateinit var kvitkiRestClient: KvitkiRestClient
+
+    @Inject
+    lateinit var notificationSharedPreferences: NotificationSharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         findViewById<BottomNavigationView>(R.id.actionsMenu)
             .setOnItemSelectedListener { getOnItemSelectedHandler(it) }
-//        Timer().scheduleAtFixedRate(object : TimerTask() {
-//            override fun run() {
-//                kvitkiRestClient.getConcertsListInfo()
-//                notificationService.showNotification("Данные обновились!")
-//            }
-//        }, 0, 30 * 60 * 1000) // 30 минут в миллисекундах
+        Timer().scheduleAtFixedRate(object : TimerTask() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun run() {
+                notificationSharedPreferences.findAllNotifications()
+                    .forEach {
+                        kvitkiRestClient.getConcertsListInfo(it.filter) { response ->
+                            if (response != null) {
+                                if (response.responseData.event.isNotEmpty()) {
+                                    notificationService.sendNotification(it)
+                                }
+                            }
+                        }
+                    }
+            }
+        }, 0, defaultNotificationInterval)
 
     }
 
@@ -90,20 +115,6 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun getNewDate(events: List<KvitkiEventApiResponse>): String {
-        var newDate = ""
-        for (event in events) {
-            // Получаем дату события из JSON-ответа (примерно)
-            val eventDate = event.startTime.shortDate // Предположим, что в объекте Event есть поле startDate
-
-            // Проверяем, если дата события больше текущей даты и даты, которую уже ранее обнаружили
-            if (eventDate.isNotEmpty() && eventDate > currentDate && (newDate.isEmpty() || eventDate > newDate)) {
-                newDate = eventDate
-            }
-        }
-        return newDate
     }
 }
 

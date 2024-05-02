@@ -13,9 +13,10 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.example.tickets_2.R
 import com.example.tickets_2.api.kvitki.KvitkiRestClient
-import com.example.tickets_2.api.model.FilterDto
+import com.example.tickets_2.models.common.FilterDto
 import com.example.tickets_2.models.api.KvitkiApiResponse
 import com.example.tickets_2.models.api.KvitkiEventApiResponse
+import com.example.tickets_2.models.common.NotificationDto
 import com.example.tickets_2.service.NotificationService
 import com.example.tickets_2.util.CommonUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -100,11 +101,9 @@ class SearchFragment : Fragment() {
                     populateGrid(eventsList, response, FilterFragment.filter)
                 } else {
                     Log.w(KvitkiRestClient.KVITKI_RESPONSE_TAG, "server returned null response")
-                    notificationService.showNotification("Возникла ошибка получения мероприятий!")
                 }
             }
         } else {
-            notificationService.showNotification("Укажите в фильтре цену 'от' меньше или равной цене 'до'!")
             Log.d(CommonUtil.DEBUG_TAG, "Price in filter to is more than price from!")
         }
 
